@@ -5,11 +5,14 @@ import { useState } from 'react';
 
 
 export default function Weather({updateInfo}){
+    
     let [city , setCity] = useState("")
+    let [error ,setError] = useState(false)
     let API_URL = "https://api.openweathermap.org/data/2.5/weather";
     let API_KEY = "768c5ef69582df8d714238461d2c0948";
  
     let weatherInfo = async () =>{
+     try{   
       let result= await fetch(`${API_URL}?q=${city}&appid=${API_KEY}&units=metric`)
       let resResult = await result.json()
       console.log(resResult)
@@ -25,6 +28,10 @@ export default function Weather({updateInfo}){
       console.log(weatherResult);
       return weatherResult
     }
+    catch (error){
+        throw error
+} 
+}
 
 
      let handleInput= (event) => {
@@ -32,12 +39,17 @@ export default function Weather({updateInfo}){
      }
 
     let handleSubmit = async (event) =>{
-        event.preventDefault()
-        console.log(city)
-        setCity("")
-        let newInfo = await weatherInfo();
-        updateInfo(newInfo)
-        
+        try{
+            event.preventDefault()
+            console.log(city)
+            setCity("")
+            let newInfo = await weatherInfo();
+            updateInfo(newInfo)
+        }
+       
+       catch(error){
+        setError(true)
+       } 
     } 
     return(
         <form onSubmit={handleSubmit}>
@@ -45,7 +57,8 @@ export default function Weather({updateInfo}){
             <div>
             <TextField id='city'  label="Enter City Name"  required value={city} onChange={handleInput}/> 
             <br></br> <br></br>
-            <Button variant="outlined " type='submit' color='succes'>Search</Button>
+            <Button sx={{ backgroundColor :"blue"}} variant="contained " type='submit'>Search</Button>
+            {error && <p style={{color :"red"}}>No Such Place Exists</p>}
             </div>
             
 
